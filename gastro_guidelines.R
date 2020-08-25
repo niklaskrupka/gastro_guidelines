@@ -1,5 +1,6 @@
 #' ---
 #' title: "Guidelines Gastroenterology and Hepatology"
+#' author: "Niklas Krupka"
 #' output:
 #'   html_document
 #' ---
