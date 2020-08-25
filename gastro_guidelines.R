@@ -2,10 +2,11 @@
 #' title: "Guidelines Gastroenterology and Hepatology"
 #' author: "Niklas Krupka"
 #' output:
-#'   html_document
+#'   html_document:
+#'     theme: lumen
 #' ---
 
-#+ stp, echo=FALSE
+#+ stp, echo=FALSE, warning=FALSE
 library(tidyverse)
 library(RefManageR)
 library(kableExtra)
@@ -34,6 +35,6 @@ bibliography <- bibliography_raw %>%
   
 kable(bibliography) %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), 
-                font_size = 12,
+                font_size = 13,
                 fixed_thead = TRUE) %>%
-  pack_rows(index = i, label_row_css = "background-color: #888; color: #fff;")
+  pack_rows(index = i, label_row_css = "background-color: #778899; color: #fff;")
