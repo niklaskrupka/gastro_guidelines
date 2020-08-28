@@ -1,10 +1,14 @@
 ---
 title: "Guidelines in Gastroenterology and Hepatology"
-author: "Niklas Krupka<"
+author: "Niklas Krupka"
 date: "29-08-2020"
 output:
   html_document:
       theme: lumen
+      toc: true
+      toc_float: true
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -22,25 +26,43 @@ names(file_list) <- str_sub(file_list, start = 22, end = -5)
 bib_list         <- map(file_list, ReadBib)
 bibliography_raw <- map_dfr(bib_list, as.data.frame, .id = "section")
 
-# Index for grouping of sections
-papers_per_section <- bibliography_raw %>% 
-  group_by(section) %>%
-  summarise(n = n())
-i <- papers_per_section$n
-names(i) <- papers_per_section$section
-
-
 bibliography <- bibliography_raw %>%
   arrange(section, `mendeley-tags`,) %>% 
-  select(title, journal, year, society = `mendeley-tags`, doi) %>%
+  select(section, title, journal, year, society = `mendeley-tags`, doi) %>%
   mutate(title = str_sub(title, start = 2, end = -2),
-         doi   = paste0("https://doi.org/", doi))
+         doi   = paste0("https://doi.org/", doi),
+         society = if_else(is.na(society), "Other/None", society))
 ```
 
-```{r tables}
-kable(bibliography) %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), 
-                font_size = 13,
-                fixed_thead = TRUE) %>%
-  pack_rows(index = i, label_row_css = "background-color: #778899; color: #fff;")
+
+## By organ
+
+```{r table1, results="asis"}
+for(i in unique(bibliography$section)){
+  cat("###", i, "\n")
+  bibliography %>%
+    filter(section == i) %>%
+    select(-section) %>%
+    arrange(society) %>% 
+    kable() %>%
+    kable_styling(bootstrap_options = c("striped", "condensed"), 
+                   font_size = 13) %>%
+    cat()
+}
+```
+
+## By society
+
+```{r table2, results="asis"}
+for(i in sort(unique(bibliography$society))){
+  cat("###", i, "\n")
+  bibliography %>%
+    filter(society == i) %>%
+    arrange(desc(year)) %>% 
+    select(-society, -section) %>%
+    kable() %>%
+    kable_styling(bootstrap_options = c("striped", "condensed"), 
+                  font_size = 13) %>%
+    cat()
+}
 ```
