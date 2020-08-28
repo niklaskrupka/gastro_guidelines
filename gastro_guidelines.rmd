@@ -15,11 +15,11 @@ library(kableExtra)
 ```
 
 
-```{r main}
+```{r calculations}
 file_list <- list.files("./bibliography/", full.names = TRUE)
 names(file_list) <- str_sub(file_list, start = 22, end = -5)
 
-bib_list <- map(file_list, ReadBib)
+bib_list         <- map(file_list, ReadBib)
 bibliography_raw <- map_dfr(bib_list, as.data.frame, .id = "section")
 
 # Index for grouping of sections
@@ -35,7 +35,9 @@ bibliography <- bibliography_raw %>%
   select(title, journal, year, society = `mendeley-tags`, doi) %>%
   mutate(title = str_sub(title, start = 2, end = -2),
          doi   = paste0("https://doi.org/", doi))
-  
+```
+
+```{r tables}
 kable(bibliography) %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), 
                 font_size = 13,
