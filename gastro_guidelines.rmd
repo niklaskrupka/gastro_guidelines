@@ -1,7 +1,7 @@
 ---
 title: "Guidelines in Gastroenterology and Hepatology"
 author: "Niklas Krupka"
-date: "29-08-2020"
+date: "01-09-2020"
 output:
   html_document:
       theme: lumen
@@ -14,7 +14,7 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE)
 library(tidyverse)
-library(RefManageR)
+library(bib2df)
 library(kableExtra)
 ```
 
@@ -22,28 +22,26 @@ library(kableExtra)
 ```{r calculations}
 file_list <- list.files("./bibliography/", full.names = TRUE)
 names(file_list) <- str_sub(file_list, start = 22, end = -5)
-
-bib_list         <- map(file_list, ReadBib)
-bibliography_raw <- map_dfr(bib_list, as.data.frame, .id = "section")
+bibliography_raw <- map_dfr(file_list, bib2df, .id = "SECTION")
 
 bibliography <- bibliography_raw %>%
-  arrange(section, `mendeley-tags`,) %>% 
-  select(section, title, journal, year, society = `mendeley-tags`, doi) %>%
-  mutate(title = str_sub(title, start = 2, end = -2),
-         doi   = paste0("https://doi.org/", doi),
-         society = if_else(is.na(society), "Other/None", society))
+  arrange(SECTION, `MENDELEY.TAGS`,) %>% 
+  select(SECTION, TITLE, JOURNAL, YEAR, SOCIETY = `MENDELEY.TAGS`, DOI) %>%
+  mutate(TITLE = str_sub(TITLE, start = 2, end = -2),
+         DOI   = paste0("https://doi.org/", DOI),
+         SOCIETY = if_else(is.na(SOCIETY), "Other/None", SOCIETY))
 ```
 
 
 ## By organ
 
 ```{r table1, results="asis"}
-for(i in unique(bibliography$section)){
+for(i in unique(bibliography$SECTION)){
   cat("###", i, "\n")
   bibliography %>%
-    filter(section == i) %>%
-    select(-section) %>%
-    arrange(society) %>% 
+    filter(SECTION == i) %>%
+    select(-SECTION) %>%
+    arrange(SOCIETY) %>% 
     kable() %>%
     kable_styling(bootstrap_options = c("striped", "condensed"), 
                    font_size = 13) %>%
@@ -54,12 +52,12 @@ for(i in unique(bibliography$section)){
 ## By society
 
 ```{r table2, results="asis"}
-for(i in sort(unique(bibliography$society))){
+for(i in sort(unique(bibliography$SOCIETY))){
   cat("###", i, "\n")
   bibliography %>%
-    filter(society == i) %>%
-    arrange(desc(year)) %>% 
-    select(-society, -section) %>%
+    filter(SOCIETY == i) %>%
+    arrange(desc(YEAR)) %>% 
+    select(-SOCIETY, -SECTION) %>%
     kable() %>%
     kable_styling(bootstrap_options = c("striped", "condensed"), 
                   font_size = 13) %>%
